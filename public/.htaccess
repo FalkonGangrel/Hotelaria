@@ -1,0 +1,76 @@
+# ---------------------------------------------------------------
+# Configurações Essenciais de Segurança
+# ---------------------------------------------------------------
+
+# Impede a listagem de diretórios (directory listing).
+# Se alguém tentar acessar uma pasta sem um arquivo index (e.g., index.php),
+# o servidor retornará um erro 403 Forbidden, em vez de mostrar a lista de arquivos.
+Options -Indexes
+
+# Protege arquivos cruciais de configuração do Apache e do seu projeto.
+# Garante que .htaccess, .htpasswd e outros arquivos importantes não possam ser acessados diretamente via URL.
+<FilesMatch "^\.(htaccess|htpasswd|env|json|yml|yaml)$">
+    Require all denied
+</FilesMatch>
+
+# Bloqueia o acesso direto a arquivos de configuração específicos da sua aplicação.
+# Adicione outros nomes de arquivos se houver necessidade (e.g., connections.php).
+<FilesMatch "^(config|database|credentials|clDB|clDotEnv)\.php$">
+    Require all denied
+</FilesMatch>
+
+# ---------------------------------------------------------------
+# Configurações de Cache (Opcional, mas recomendado para performance)
+# ---------------------------------------------------------------
+# Define regras de cache para tipos de arquivos estáticos, melhorando a velocidade de carregamento.
+# Ajuste os tempos (e.g., "access plus 1 month") conforme a necessidade do seu projeto.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType application/pdf "access plus 1 month"
+</IfModule>
+
+# ---------------------------------------------------------------
+# Roteamento e URLs Amigáveis
+# ---------------------------------------------------------------
+
+# Ativa o módulo de reescrita de URLs do Apache. Essencial para URLs amigáveis.
+RewriteEngine On
+
+# Define a base da reescrita. No caso de localhost, geralmente é a raiz do domínio.
+# Se sua aplicação estiver em um subdiretório (e.g., localhost/meu_projeto), ajuste para /meu_projeto/
+RewriteBase /
+
+# Redireciona requisições para o seu index.php na pasta public.
+# Essa é a regra que garante que todas as URLs da sua aplicação sejam processadas
+# pelo seu arquivo principal de roteamento PHP, em vez de procurar por arquivos ou pastas reais.
+#
+# - RewriteCond %{REQUEST_FILENAME} !-f : Se a requisição NÃO for para um arquivo existente.
+# - RewriteCond %{REQUEST_FILENAME} !-d : Se a requisição NÃO for para um diretório existente.
+# - RewriteRule ^(.*)$ index.php [QSA,L] : Redireciona a requisição para index.php,
+#   passando a string da URL como parâmetro (QSA) e para a reescrita (L).
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# ---------------------------------------------------------------
+# Evitar o acesso direto a arquivos PHP em subdiretórios (exceto index.php)
+# ---------------------------------------------------------------
+# Embora o roteador já cuide disso, esta é uma camada extra para garantir
+# que nenhum arquivo .php seja acessado diretamente fora do fluxo do roteamento,
+# exceto o index.php na raiz da pasta public.
+<FilesMatch "\.php$">
+    # Permitir o acesso ao index.php
+    <If "%{REQUEST_URI} =~ m#^/index\.php$#">
+        Require all granted
+    </If>
+    # Negar acesso a todos os outros arquivos .php
+    <Else>
+        Require all denied
+    </Else>
+</FilesMatch>

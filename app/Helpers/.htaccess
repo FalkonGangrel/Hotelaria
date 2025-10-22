@@ -1,0 +1,4 @@
+# Nega o acesso a todos os arquivos e subdiretórios dentro desta pasta.
+# Isso garante que nenhum arquivo de código-fonte, templates ou dados sensíveis
+# possa ser acessado diretamente de um navegador.
+Require all denied
