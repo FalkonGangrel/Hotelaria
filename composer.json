@@ -1,0 +1,15 @@
+{
+    "name": "dell/hotelaria",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "FalkonGangrel",
+            "email": "falkon.gangrel@gmail.com"
+        }
+    ],
+    "require": {}
+}
