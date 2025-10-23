@@ -7,8 +7,7 @@ class DashboardController
 {
     public function index()
     {
-        // Auth::authorize(['master', 'admin', 'fornecedor']);
-        Auth::authorize([]);
+        Auth::authorize(['master', 'admin', 'fornecedor']);
         view('dashboard/home', ['title' => 'Painel de Controle']);
     }
 }
