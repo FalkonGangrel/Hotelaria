@@ -54,13 +54,9 @@ function dispatch(): void
             return;
         }
     }
-    var_dump($routes);
-    echo "<br>";
-    var_dump($requestUri);
-    echo "<br>";
-    var_dump($requestMethod);
-    // http_response_code(404);
-    // echo "<h1>404 - Página não encontrada</h1>";
+
+    http_response_code(404);
+    echo "<h1>404 - Página não encontrada</h1>";
 }
 
 /**

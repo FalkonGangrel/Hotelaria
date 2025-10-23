@@ -32,7 +32,7 @@ class LoginController
 
         $user = User::findByEmail($email);
 
-        if (!$user || !password_verify($senha, $user['senha'])) {
+        if (!$user || !password_verify($senha, $user['password'])) {
             $_SESSION['error'] = 'Usuário ou senha inválidos.';
             return redirect('/login');
         }

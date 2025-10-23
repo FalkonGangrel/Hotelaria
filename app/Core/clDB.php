@@ -86,7 +86,7 @@ class clDB
     }
 
     /** wrapper simples para prepare-execute */
-    public function query(string $sql, ...$params): bool
+    public function query(string $sql, array $params = []): bool
     {
         try {
             $this->stmt = $this->pdo->prepare($sql);
@@ -161,6 +161,9 @@ class clDB
     {
         $data = date("Y-m-d H:i:s");
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'localhost';
+        if (is_array($mensagem)) {
+            $mensagem = print_r($mensagem, true);
+        }
         $log = "[{$data}] [{$ip}] [{$this->class_error}] {$mensagem}\n";
 
         // Garante que o diretório existe

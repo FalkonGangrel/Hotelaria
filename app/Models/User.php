@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use App\Core\clDB;
-use PDO;
-
 class User extends BaseModel
 {
     public static function findByEmail($email)
     {
+        $sql = "SELECT * FROM users WHERE login = :email LIMIT 1";
         $db = static::db();
-        $sql = "SELECT * FROM usuarios WHERE email = :email LIMIT 1";
-        $db->query($sql);
+        $db->query($sql, [':email' => $email]);
         $row = $db->fetchArray();
         return $row ?: null;
     }
