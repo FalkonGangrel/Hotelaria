@@ -9,8 +9,12 @@ class Auth
      * 
      * @param array $roles Perfis permitidos (ex: ['master', 'admin'])
      */
-    public static function check(array $roles = [])
+    public static function authorize(array $roles = []): bool
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         if (!isset($_SESSION['user'])) {
             $_SESSION['error'] = 'Você precisa estar logado para acessar esta página.';
             header('Location: /login');
@@ -19,7 +23,7 @@ class Auth
 
         $user = $_SESSION['user'];
 
-        // Se não houver restrição de papel, só precisa estar logado
+        // Se não houver restrição de papel, apenas precisa estar logado
         if (empty($roles)) {
             return true;
         }
@@ -37,7 +41,7 @@ class Auth
     /**
      * Retorna o usuário autenticado
      */
-    public static function user()
+    public static function user(): ?array
     {
         return $_SESSION['user'] ?? null;
     }
@@ -45,8 +49,12 @@ class Auth
     /**
      * Faz logout do usuário
      */
-    public static function logout()
+    public static function logout(): void
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         unset($_SESSION['user']);
         session_destroy();
         header('Location: /login');
