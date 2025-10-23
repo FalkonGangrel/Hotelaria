@@ -1,53 +1,94 @@
 <?php
-// routes.php
+use App\Controllers\LoginController;
+use App\Controllers\ProductController;
+use App\Controllers\DashboardController;
 
+/**
+ * Sistema simples de rotas com suporte a múltiplas rotas e métodos HTTP.
+ */
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$method = $_SERVER['REQUEST_METHOD'];
+$routes = [];
 
+/**
+ * Registra uma rota
+ */
+function route(string $method, string $uri, $action): void
+{
+    global $routes;
+    $routes[] = [
+        'method' => strtoupper($method),
+        'uri'    => rtrim($uri, '/'),
+        'action' => $action
+    ];
+}
 
-// rotas simples — mapeie para controllers
-function route(string $path, callable $cb) {
-    global $uri;
-    if ($uri === $path) {
-        $cb();
-        exit;
+/**
+ * Inicia o roteamento
+ */
+function dispatch(): void
+{
+    global $routes;
+
+    $requestUri    = strtok($_SERVER['REQUEST_URI'], '?');
+    $requestMethod = strtoupper($_SERVER['REQUEST_METHOD']);
+
+    foreach ($routes as $route) {
+        if ($route['uri'] === rtrim($requestUri, '/') && $route['method'] === $requestMethod) {
+            $action = $route['action'];
+
+            if (is_array($action)) {
+                [$controller, $method] = $action;
+                if (class_exists($controller)) {
+                    (new $controller)->$method();
+                    return;
+                }
+            }
+
+            if (is_callable($action)) {
+                $action();
+                return;
+            }
+
+            http_response_code(500);
+            echo "Rota inválida para {$requestUri}";
+            return;
+        }
     }
+    var_dump($routes);
+    echo "<br>";
+    var_dump($requestUri);
+    echo "<br>";
+    var_dump($requestMethod);
+    // http_response_code(404);
+    // echo "<h1>404 - Página não encontrada</h1>";
 }
 
+/**
+ * -----------------------------
+ * ROTAS DO SISTEMA
+ * -----------------------------
+ */
 
-// Home
-route('/', function() { (new \App\Controllers\DashboardController())->index(); });
+// Index
+route('GET', '/', [DashboardController::class, 'index']);
 
+// Login
+route('GET', '/login', [LoginController::class, 'index']);
+route('POST', '/login', [LoginController::class, 'authenticate']);
+route('GET', '/logout', [LoginController::class, 'logout']);
 
-// Auth
-route('/login', function() {
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-(new \App\Controllers\AuthController())->login();
-} else {
-(new \App\Controllers\AuthController())->showLogin();
-}
-});
-route('/logout', function(){ (new \App\Controllers\AuthController())->logout(); });
+// Dashboard
+route('GET', '/dashboard', [DashboardController::class, 'index']);
 
+// Produtos
+route('GET', '/produtos', [ProductController::class, 'index']);
+route('GET', '/produtos/novo', [ProductController::class, 'create']);
+route('POST', '/produtos/salvar', [ProductController::class, 'store']);
+route('GET', '/produtos/editar', [ProductController::class, 'edit']);
+route('POST', '/produtos/atualizar', [ProductController::class, 'update']);
+route('GET', '/produtos/excluir', [ProductController::class, 'delete']);
 
-// Products
-route('/products', function(){ (new \App\Controllers\ProductController())->index(); });
-route('/products/create', function(){ (new \App\Controllers\ProductController())->create(); });
-route('/products/store', function(){ (new \App\Controllers\ProductController())->store(); });
-
-
-// Suppliers
-route('/suppliers', function(){ (new \App\Controllers\SupplierController())->index(); });
-route('/suppliers/create', function(){ (new \App\Controllers\SupplierController())->create(); });
-route('/suppliers/store', function(){ (new \App\Controllers\SupplierController())->store(); });
-
-
-// Orders
-route('/orders', function(){ (new \App\Controllers\OrderController())->index(); });
-route('/orders/generate-link', function(){ (new \App\Controllers\OrderController())->generateLink(); });
-route('/purchase', function(){ (new \App\Controllers\OrderController())->publicPurchase(); });
-
-
-// 404 fallback
-http_response_code(404); echo "Not Found";
+/**
+ * Dispara o roteamento
+ */
+dispatch();
