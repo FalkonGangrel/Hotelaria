@@ -13,44 +13,61 @@ if (!function_exists('env')) {
      * @param mixed  $default Valor padrão retornado caso a variável não exista.
      * @return mixed
      */
-    function env(string $key, $default = null)
-    {
+    function env(string $key, $default = null) {
         // Verifica se a variável está definida no ambiente
-        if (isset($_ENV[$key])) {
-            return $_ENV[$key];
-        }
+        if (array_key_exists($key, $_ENV)) return $_ENV[$key];
+
+        // Verifica se a chave está definida no ambiente e retorna o valor
+        $val = getenv($key);
+        if ($val !== false) return $val;
 
         // Retorna valor padrão caso não esteja definida
         return $default;
     }
 }
 
+if (!function_exists('view')) {
+    /**
+     * Carrega uma view e passa variáveis para ela.
+     */
+    function view(string $path, array $data = [])
+    {
+        extract($data);
 
-function view(string $path, array $data = []) {
-    extract($data);
-    require __DIR__ . "/../Views/{$path}";
+        // Corrige separador de diretório e adiciona extensão .php
+        $viewFile = __DIR__ . '/../Views/' . str_replace('.', '/', $path) . '.php';
+
+        if (!file_exists($viewFile)) {
+            throw new \RuntimeException("View não encontrada: {$viewFile}");
+        }
+
+        require $viewFile;
+    }
 }
 
+/**
+ * Retorna a instância única de clDB (wrapper)
+ * Uso: $db = db(); $db->query(...);
+ */
+function db(): \App\Core\clDB {
+    // usa a instância criada em init.php
+    if (!empty($GLOBALS['db']) && $GLOBALS['db'] instanceof \App\Core\clDB) {
+        return $GLOBALS['db'];
+    }
+    // fallback: cria nova instância a partir das env
+    return \App\Core\clDB::getInstance([
+        'driver' => env('DB_DRIVER', 'my_driver'),
+        'host'   => env('DB_HOST', 'my_host'),
+        'port'   => env('DB_PORT', 'my_port'),
+        'name'   => env('DB_NAME', 'my_db'),
+        'user'   => env('DB_USER', 'my_user'),
+        'pass'   => env('DB_PASS', 'my_pass')
+    ]);
+}
 
 function redirect(string $url) {
     header('Location: ' . $url);
     exit;
-}
-
-
-function auth(): ?array {
-    return $_SESSION['user'] ?? null;
-}
-
-
-function assert_role(array $roles = []) {
-    $u = auth();
-    if (!$u) {
-        http_response_code(401); echo 'Unauthorized'; exit;
-    }
-    if (!empty($roles) && !in_array($u['role'], $roles)) {
-        http_response_code(403); echo 'Forbidden'; exit;
-    }
 }
 
 
@@ -60,16 +77,6 @@ function generate_uuid(): string {
         return bin2hex(random_bytes(16));
     }
     return uniqid('', true);
-}
-
-function db(): clDB
-{
-    return new clDB(
-        $_ENV['DB_HOST'] ?? 'my_host',
-        $_ENV['DB_USER'] ?? 'my_user',
-        $_ENV['DB_PASS'] ?? 'my_pass',
-        $_ENV['DB_NAME'] ?? 'my_db'
-    );
 }
 
 function logErro($mensagem) {

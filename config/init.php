@@ -4,24 +4,50 @@ use App\Core\clDB;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// 1️⃣ Carregar variáveis de ambiente
+// Carrega .env via sua clDotEnv (ou use phpdotenv)
 $dotenv = new clDotEnv(__DIR__ . '/../.env');
 $dotenv->load();
 
-// 2️⃣ Configurar conexão com o banco
-$driver = $_ENV['DB_DRIVER'] ?? 'pgsql';
-$host = $_ENV['DB_HOST'] ?? 'localhost';
-$dbname = $_ENV['DB_DATABASE'] ?? 'meu_comercio';
-$user = $_ENV['DB_USERNAME'] ?? 'postgres';
-$pass = $_ENV['DB_PASSWORD'] ?? '';
-$port = $_ENV['DB_PORT'] ?? '5432';
-
-// 3️⃣ Criar instância de conexão usando sua classe personalizada
-try {
-    $db = new clDB($host, $user, $pass, $dbname, 'utf8', $driver, $port);
-} catch (Exception $e) {
-    die("Erro ao conectar ao banco de dados: " . $e->getMessage());
+// --- Normaliza chaves (aceita DB_USERNAME ou DB_USER, etc.)
+if (!isset($_ENV['DB_USER']) && isset($_ENV['DB_USERNAME'])) {
+    $_ENV['DB_USER'] = $_ENV['DB_USERNAME'];
+}
+if (!isset($_ENV['DB_PASS']) && isset($_ENV['DB_PASSWORD'])) {
+    $_ENV['DB_PASS'] = $_ENV['DB_PASSWORD'];
+}
+if (!isset($_ENV['DB_NAME']) && isset($_ENV['DB_DATABASE'])) {
+    $_ENV['DB_NAME'] = $_ENV['DB_DATABASE'];
+}
+if (!isset($_ENV['DB_DRIVER'])) {
+    $_ENV['DB_DRIVER'] = $_ENV['DB_DRIVER'] ?? 'pgsql';
+}
+if (!isset($_ENV['DB_HOST'])) {
+    $_ENV['DB_HOST'] = $_ENV['DB_HOST'] ?? 'localhost';
+}
+if (!isset($_ENV['DB_PORT'])) {
+    $_ENV['DB_PORT'] = $_ENV['DB_PORT'] ?? '5432';
 }
 
-// 4️⃣ Disponibilizar globalmente
+// Inicia sessão cedo
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Cria a instância única e a expõe em $GLOBALS['db'] via clDB::getInstance()
+try {
+    $db = \App\Core\clDB::getInstance([
+        'driver' => $_ENV['DB_DRIVER'],
+        'host'   => $_ENV['DB_HOST'],
+        'port'   => $_ENV['DB_PORT'],
+        'name'   => $_ENV['DB_NAME'],
+        'user'   => $_ENV['DB_USER'],
+        'pass'   => $_ENV['DB_PASS'],
+        'charset'=> $_ENV['DB_CHARSET'] ?? 'utf8'
+    ]);
+} catch (\Exception $e) {
+    // Mostra mensagem simplificada em dev; em prod, log e mensagem amigável
+    echo "Erro de configuração do banco: " . $e->getMessage();
+    exit;
+}
+
 $GLOBALS['db'] = $db;

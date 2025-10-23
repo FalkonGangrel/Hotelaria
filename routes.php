@@ -74,7 +74,7 @@ route('GET', '/', [DashboardController::class, 'index']);
 
 // Login
 route('GET', '/login', [LoginController::class, 'index']);
-route('POST', '/login', [LoginController::class, 'authenticate']);
+route('POST', '/login/autenticar', [LoginController::class, 'authenticate']);
 route('GET', '/logout', [LoginController::class, 'logout']);
 
 // Dashboard
