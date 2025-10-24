@@ -45,7 +45,7 @@ class LoginController
             'role' => $user['role']
         ];
 
-        $_SESSION['success'] = 'Bem-vindo, ' . $user['nome'] . '!';
+        $_SESSION['success'] = 'Bem-vindo, ' . $user['name'] . '!';
         return redirect('/dashboard');
     }
 

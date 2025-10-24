@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title ?? 'Painel - Hotelaria Brasil'); ?></title>
+    <title><?= htmlspecialchars($title ?? 'Painel - Empresa'); ?></title>
 
     <!-- CSS Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,7 +38,7 @@
 
 <header>
     <div class="container d-flex justify-content-between align-items-center">
-        <h3 class="m-0">Hotelaria Brasil - Painel</h3>
+        <h3 class="m-0">Empresa - Painel</h3>
         <nav>
             <a href="/dashboard" class="btn btn-light btn-sm me-2">Dashboard</a>
             <a href="/produtos" class="btn btn-light btn-sm me-2">Produtos</a>

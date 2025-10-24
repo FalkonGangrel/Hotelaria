@@ -1,3 +1,6 @@
+<?php
+    ob_start();
+?>
 <div class="container mt-5" style="max-width: 400px;">
     <h2 class="text-center mb-4"><?= $title; ?></h2>
 
@@ -23,3 +26,8 @@
         <button type="submit" class="btn btn-primary w-100">Entrar</button>
     </form>
 </div>
+
+<?php
+$content = ob_get_clean();
+$title = "Produtos";
+include __DIR__ . '/../layouts/main.php';

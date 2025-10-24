@@ -1,5 +1,6 @@
 <?php
 /** @var array|null $product */
+ob_start();
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2><?= $title ?></h2>
@@ -34,3 +35,8 @@
 
     <button type="submit" class="btn btn-success">Salvar</button>
 </form>
+
+<?php
+$content = ob_get_clean();
+$title = "Produtos";
+include __DIR__ . '/../layouts/main.php';

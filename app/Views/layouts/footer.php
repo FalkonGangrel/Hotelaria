@@ -1,5 +1,5 @@
 <footer>
-    <small>&copy; <?= date('Y'); ?> Hotelaria Brasil - Todos os direitos reservados.</small>
+    <small>&copy; <?= date('Y'); ?> Empresa - Todos os direitos reservados.</small>
 </footer>
 
 <!-- JS Bootstrap -->
