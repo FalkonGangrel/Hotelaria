@@ -1,3 +1,5 @@
 /vendor/
-.env
 /storage
+/.vscode
+.env
+.envh
