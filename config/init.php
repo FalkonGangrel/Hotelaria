@@ -5,7 +5,12 @@ use App\Core\clDB;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Carrega .env via sua clDotEnv (ou use phpdotenv)
-$dotenv = new clDotEnv(__DIR__ . '/../.env');
+if($_SERVER['SERVER_NAME'] === 'projetos.hotelaria'){
+    $fEnv = '/../.envh';
+} else {
+    $fEnv = '/../.env';
+}
+$dotenv = new clDotEnv(__DIR__ . $fEnv);
 $dotenv->load();
 
 // --- Normaliza chaves (aceita DB_USERNAME ou DB_USER, etc.)
