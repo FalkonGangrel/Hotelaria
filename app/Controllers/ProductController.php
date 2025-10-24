@@ -3,109 +3,119 @@
 namespace App\Controllers;
 
 use App\Models\Product;
-use App\Models\Supplier;
-use App\Models\ProductSupplier;
 use App\Helpers\Auth;
 
 class ProductController
 {
-    public function index()
+    public function index(): void
     {
-        Auth::check(['master', 'admin', 'fornecedor']);
-        $products = Product::allWithSuppliers();
-        view('products/list', [
+        Auth::authorize(['master','admin','fornecedor']);
+
+        $product = new Product();
+        $produtos = $product->all();
+
+        view('produtos/list', [
             'title' => 'Lista de Produtos',
-            'products' => $products
+            'products' => $produtos
         ]);
     }
 
-    public function create()
+    public function create(): void
     {
-        Auth::check(['master', 'admin']);
-        $suppliers = Supplier::all();
-        view('products/form', [
-            'title' => 'Novo Produto',
-            'suppliers' => $suppliers
-        ]);
+        Auth::authorize(['master', 'admin']);
+        view('produtos/form', ['title' => 'Novo Produto']);
     }
 
-    public function store()
+    public function store(): void
     {
-        Auth::check(['master', 'admin']);
+        Auth::authorize(['master', 'admin']);
 
         $data = [
-            'nome' => trim($_POST['nome'] ?? ''),
-            'descricao' => trim($_POST['descricao'] ?? ''),
-            'preco_base' => floatval($_POST['preco_base'] ?? 0),
-            'ativo' => isset($_POST['ativo']) ? 1 : 0
+            'sku' => trim($_POST['sku'] ?? ''),
+            'title' => trim($_POST['title'] ?? ''),
+            'description' => trim($_POST['description'] ?? ''),
+            'price' => floatval($_POST['price'] ?? 0),
+            'active' => isset($_POST['active']) ? true : false
         ];
 
-        if (empty($data['nome'])) {
+        if (empty($data['title'])) {
             $_SESSION['error'] = 'O nome do produto é obrigatório.';
-            return redirect('/produtos/novo');
+            redirect('/produtos/novo');
+            return;
         }
 
-        $productId = Product::create($data);
+        $product = new Product();
+        $id = $product->create($data);
 
-        if (!empty($_POST['fornecedores'])) {
-            ProductSupplier::syncSuppliers($productId, $_POST['fornecedores']);
+        if ($id) {
+            $_SESSION['success'] = 'Produto cadastrado com sucesso!';
+        } else {
+            $_SESSION['error'] = 'Erro ao cadastrar o produto.';
         }
 
-        $_SESSION['success'] = 'Produto cadastrado com sucesso!';
-        return redirect('/produtos');
+        redirect('/produtos');
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
-        Auth::check(['master', 'admin']);
-        $product = Product::find($id);
-        $suppliers = Supplier::all();
-        $selected = ProductSupplier::getSuppliersByProduct($id);
+        Auth::authorize(['master', 'admin']);
 
-        if (!$product) {
+        $product = new Product();
+        $item = $product->find($id);
+
+        if (!$item) {
             $_SESSION['error'] = 'Produto não encontrado.';
-            return redirect('/produtos');
+            redirect('/produtos');
+            return;
         }
 
-        view('products/form', [
+        view('produtos/form', [
             'title' => 'Editar Produto',
-            'product' => $product,
-            'suppliers' => $suppliers,
-            'selected' => $selected
+            'product' => $item
         ]);
     }
 
-    public function update($id)
+    public function update(int $id): void
     {
-        Auth::check(['master', 'admin']);
+        Auth::authorize(['master', 'admin']);
 
         $data = [
-            'nome' => trim($_POST['nome'] ?? ''),
-            'descricao' => trim($_POST['descricao'] ?? ''),
-            'preco_base' => floatval($_POST['preco_base'] ?? 0),
-            'ativo' => isset($_POST['ativo']) ? 1 : 0
+            'sku' => trim($_POST['sku'] ?? ''),
+            'title' => trim($_POST['title'] ?? ''),
+            'description' => trim($_POST['description'] ?? ''),
+            'price' => floatval($_POST['price'] ?? 0),
+            'active' => isset($_POST['active']) ? true : false
         ];
 
-        if (empty($data['nome'])) {
-            $_SESSION['error'] = 'O nome do produto é obrigatório.';
-            return redirect('/produtos/editar/' . $id);
-        }
+        $product = new Product();
+        $ok = $product->update($id, $data);
 
-        Product::update($id, $data);
+        $_SESSION[$ok ? 'success' : 'error'] = $ok
+            ? 'Produto atualizado com sucesso!'
+            : 'Erro ao atualizar produto.';
 
-        if (isset($_POST['fornecedores'])) {
-            ProductSupplier::syncSuppliers($id, $_POST['fornecedores']);
-        }
-
-        $_SESSION['success'] = 'Produto atualizado com sucesso!';
-        return redirect('/produtos');
+        redirect('/produtos');
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        Auth::check(['master']);
-        Product::delete($id);
+        Auth::authorize(['master', 'admin']);
+
+        $product = new Product();
+        $product->delete($id);
+
         $_SESSION['success'] = 'Produto removido com sucesso!';
-        return redirect('/produtos');
+        redirect('/produtos');
+    }
+
+    public function reactivate(int $id): void
+    {
+        Auth::authorize(['master', 'admin']);
+
+        $product = new Product();
+        $product->reactivate($id);
+
+        $_SESSION['success'] = 'Produto reativado com sucesso!';
+        redirect('/produtos');
     }
 }

@@ -23,35 +23,39 @@ class Product
     public function find(int $id): ?array
     {
         $sql = "SELECT * FROM products WHERE id = ?";
-        $this->db->query($sql, $id);
+        $this->db->query($sql, [$id]);
         $row = $this->db->fetchArray();
         return $row ?: null;
     }
 
-    public function create(array $data): bool
+    public function create(array $data): int|false
     {
-        $sql = "INSERT INTO products (name, description, price) VALUES (?, ?, ?)";
-        return $this->db->query($sql, $data['name'], $data['description'], $data['price']);
+        $sql = "INSERT INTO products (sku, title, description, price, active) 
+                VALUES (?, ?, ?, ?, ?) RETURNING id";
+        $this->db->query($sql, [$data['sku'], $data['title'], $data['description'], $data['price'], $data['active']]);
+        $row = $this->db->fetchArray();
+        return $row['id'] ?? false;
     }
 
     public function update(int $id, array $data): bool
     {
-        $sql = "UPDATE products SET name = ?, description = ?, price = ? WHERE id = ?";
-        return $this->db->query($sql, $data['name'], $data['description'], $data['price'], $id);
+        $sql = "UPDATE products 
+                SET sku = ?, title = ?, description = ?, price = ?, active = ?, updated_at = now()
+                WHERE id = ?";
+        return $this->db->query($sql, [$data['sku'], $data['title'], $data['description'], $data['price'], $data['active'], $id]);
     }
 
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM products WHERE id = ?";
-        return $this->db->query($sql, $id);
+        // Soft delete (marca como inativo)
+        $sql = "UPDATE products SET active = false, updated_at = now() WHERE id = ?";
+        return $this->db->query($sql, [$id]);
     }
 
-    public function suppliers(int $productId): array
+    public function reactivate(int $id): bool
     {
-        $sql = "SELECT s.* FROM suppliers s
-                JOIN product_supplier ps ON ps.supplier_id = s.id
-                WHERE ps.product_id = ?";
-        $this->db->query($sql, $productId);
-        return $this->db->fetchAll();
+        // Soft delete (marca como inativo)
+        $sql = "UPDATE products SET active = true, updated_at = now() WHERE id = ?";
+        return $this->db->query($sql, [$id]);
     }
 }

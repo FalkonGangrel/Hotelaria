@@ -29,23 +29,32 @@ function dispatch(): void
 {
     global $routes;
 
-    $requestUri    = strtok($_SERVER['REQUEST_URI'], '?');
+    $requestUri    = rtrim(strtok($_SERVER['REQUEST_URI'], '?'), '/');
     $requestMethod = strtoupper($_SERVER['REQUEST_METHOD']);
 
     foreach ($routes as $route) {
-        if ($route['uri'] === rtrim($requestUri, '/') && $route['method'] === $requestMethod) {
+        // Transforma /produtos/editar/:id → regex /produtos/editar/([^/]+)
+        $pattern = preg_replace('#:([\w]+)#', '([^/]+)', $route['uri']);
+        $pattern = '#^' . $pattern . '$#';
+
+        if ($route['method'] === $requestMethod && preg_match($pattern, $requestUri, $matches)) {
+            array_shift($matches); // remove o match completo
             $action = $route['action'];
 
             if (is_array($action)) {
                 [$controller, $method] = $action;
+
                 if (class_exists($controller)) {
-                    (new $controller)->$method();
+                    $instance = new $controller();
+
+                    // Chama o método com parâmetros da URL (ex: id)
+                    call_user_func_array([$instance, $method], $matches);
                     return;
                 }
             }
 
             if (is_callable($action)) {
-                $action();
+                call_user_func_array($action, $matches);
                 return;
             }
 
@@ -58,6 +67,7 @@ function dispatch(): void
     http_response_code(404);
     echo "<h1>404 - Página não encontrada</h1>";
 }
+
 
 /**
  * -----------------------------
@@ -80,9 +90,10 @@ route('GET', '/dashboard', [DashboardController::class, 'index']);
 route('GET', '/produtos', [ProductController::class, 'index']);
 route('GET', '/produtos/novo', [ProductController::class, 'create']);
 route('POST', '/produtos/salvar', [ProductController::class, 'store']);
-route('GET', '/produtos/editar', [ProductController::class, 'edit']);
-route('POST', '/produtos/atualizar', [ProductController::class, 'update']);
-route('GET', '/produtos/excluir', [ProductController::class, 'delete']);
+route('GET', '/produtos/editar/:id', [ProductController::class, 'edit']);
+route('POST', '/produtos/atualizar/:id', [ProductController::class, 'update']);
+route('GET', '/produtos/excluir/:id', [ProductController::class, 'delete']);
+route('GET', '/produtos/reativar/:id', [ProductController::class, 'reactivate']);
 
 /**
  * Dispara o roteamento
