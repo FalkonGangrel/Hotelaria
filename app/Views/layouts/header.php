@@ -40,10 +40,10 @@
     <div class="container d-flex justify-content-between align-items-center">
         <h3 class="m-0">Empresa - Painel</h3>
         <nav>
-            <a href="/dashboard" class="btn btn-light btn-sm me-2">Dashboard</a>
-            <a href="/produtos" class="btn btn-light btn-sm me-2">Produtos</a>
-            <a href="/fornecedores" class="btn btn-light btn-sm me-2">Fornecedores</a>
-            <a href="/logout" class="btn btn-danger btn-sm">Sair</a>
+            <a href="<?=$_ENV['APP_BASE']?>/dashboard" class="btn btn-light btn-sm me-2">Dashboard</a>
+            <a href="<?=$_ENV['APP_BASE']?>/produtos" class="btn btn-light btn-sm me-2">Produtos</a>
+            <a href="<?=$_ENV['APP_BASE']?>/fornecedores" class="btn btn-light btn-sm me-2">Fornecedores</a>
+            <a href="<?=$_ENV['APP_BASE']?>/logout" class="btn btn-danger btn-sm">Sair</a>
         </nav>
     </div>
 </header>

@@ -16,8 +16,9 @@ class Auth
         }
 
         if (!isset($_SESSION['user'])) {
+            $url = $_ENV['APP_BASE'].'/login';
             $_SESSION['error'] = 'Você precisa estar logado para acessar esta página.';
-            header('Location: /login');
+            header('Location: ' . $url);
             exit;
         }
 
@@ -30,8 +31,9 @@ class Auth
 
         // Verifica se o papel do usuário está na lista permitida
         if (!in_array($user['role'], $roles)) {
+            $url = $_ENV['APP_BASE'].'/dashboard';
             $_SESSION['error'] = 'Você não tem permissão para acessar esta área.';
-            header('Location: /dashboard');
+            header('Location: ' . $url);
             exit;
         }
 
@@ -57,7 +59,8 @@ class Auth
 
         unset($_SESSION['user']);
         session_destroy();
-        header('Location: /login');
+        $url = $_ENV['APP_BASE'].'/dashboard';
+        header('Location: '. $url);
         exit;
     }
 }

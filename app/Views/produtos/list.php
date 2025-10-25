@@ -4,7 +4,7 @@
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2><?= $title ?></h2>
-    <a href="/produtos/novo" class="btn btn-primary">Novo Produto</a>
+    <a href="<?=$_ENV['APP_BASE']?>/produtos/novo" class="btn btn-primary">Novo Produto</a>
 </div>
 
 <?php if (!empty($_SESSION['success'])): ?>
@@ -33,15 +33,15 @@
                 <td>R$ <?= number_format($p['price'], 2, ',', '.') ?></td>
                 <td><?= $p['active'] ? 'Sim' : 'Não' ?></td>
                 <td>
-                    <a href="/produtos/editar/<?= $p['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="<?=$_ENV['APP_BASE']?>/produtos/editar/<?= $p['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
                     <?php
                         if ($p['active']):
                     ?>
-                        <a href="/produtos/excluir/<?= $p['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Remover este produto?')">Excluir</a>
+                        <a href="<?=$_ENV['APP_BASE']?>/produtos/excluir/<?= $p['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Remover este produto?')">Excluir</a>
                     <?php
                         else:
                     ?>
-                        <a href="/produtos/reativar/<?= $p['id'] ?>" class="btn btn-sm btn-success" onclick="return confirm('Reativar este produto?')">Reativar</a>
+                        <a href="<?=$_ENV['APP_BASE']?>/produtos/reativar/<?= $p['id'] ?>" class="btn btn-sm btn-success" onclick="return confirm('Reativar este produto?')">Reativar</a>
                     <?php
                         endif;
                     ?>

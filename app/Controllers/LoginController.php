@@ -27,14 +27,14 @@ class LoginController
 
         if (empty($email) || empty($senha)) {
             $_SESSION['error'] = 'Preencha todos os campos.';
-            return redirect('/login');
+            return redirect($_ENV['APP_BASE'].'/login');
         }
 
         $user = User::findByEmail($email);
 
         if (!$user || !password_verify($senha, $user['password'])) {
             $_SESSION['error'] = 'Usuário ou senha inválidos.';
-            return redirect('/login');
+            return redirect($_ENV['APP_BASE'].'/login');
         }
 
         // Armazena dados mínimos na sessão
@@ -46,7 +46,7 @@ class LoginController
         ];
 
         $_SESSION['success'] = 'Bem-vindo, ' . $user['name'] . '!';
-        return redirect('/dashboard');
+        return redirect($_ENV['APP_BASE'].'/dashboard');
     }
 
     public function logout()

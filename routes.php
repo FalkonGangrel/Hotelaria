@@ -64,6 +64,11 @@ function dispatch(): void
         }
     }
 
+
+    // var_dump($requestUri);
+    // echo("<br >");
+    // var_dump($requestMethod);
+    // exit;
     http_response_code(404);
     echo "<h1>404 - Página não encontrada</h1>";
 }
@@ -76,24 +81,24 @@ function dispatch(): void
  */
 
 // Index
-route('GET', '/', [DashboardController::class, 'index']);
+route('GET', $_ENV['APP_BASE'].'/', [DashboardController::class, 'index']);
 
 // Login
-route('GET', '/login', [LoginController::class, 'index']);
-route('POST', '/login/autenticar', [LoginController::class, 'authenticate']);
-route('GET', '/logout', [LoginController::class, 'logout']);
+route('GET', $_ENV['APP_BASE'].'/login', [LoginController::class, 'index']);
+route('POST', $_ENV['APP_BASE'].'/login/autenticar', [LoginController::class, 'authenticate']);
+route('GET', $_ENV['APP_BASE'].'/logout', [LoginController::class, 'logout']);
 
 // Dashboard
-route('GET', '/dashboard', [DashboardController::class, 'index']);
+route('GET', $_ENV['APP_BASE'].'/dashboard', [DashboardController::class, 'index']);
 
 // Produtos
-route('GET', '/produtos', [ProductController::class, 'index']);
-route('GET', '/produtos/novo', [ProductController::class, 'create']);
-route('POST', '/produtos/salvar', [ProductController::class, 'store']);
-route('GET', '/produtos/editar/:id', [ProductController::class, 'edit']);
-route('POST', '/produtos/atualizar/:id', [ProductController::class, 'update']);
-route('GET', '/produtos/excluir/:id', [ProductController::class, 'delete']);
-route('GET', '/produtos/reativar/:id', [ProductController::class, 'reactivate']);
+route('GET', $_ENV['APP_BASE'].'/produtos', [ProductController::class, 'index']);
+route('GET', $_ENV['APP_BASE'].'/produtos/novo', [ProductController::class, 'create']);
+route('POST', $_ENV['APP_BASE'].'/produtos/salvar', [ProductController::class, 'store']);
+route('GET', $_ENV['APP_BASE'].'/produtos/editar/:id', [ProductController::class, 'edit']);
+route('POST', $_ENV['APP_BASE'].'/produtos/atualizar/:id', [ProductController::class, 'update']);
+route('GET', $_ENV['APP_BASE'].'/produtos/excluir/:id', [ProductController::class, 'delete']);
+route('GET', $_ENV['APP_BASE'].'/produtos/reativar/:id', [ProductController::class, 'reactivate']);
 
 /**
  * Dispara o roteamento

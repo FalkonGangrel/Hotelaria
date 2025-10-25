@@ -40,7 +40,7 @@ class ProductController
 
         if (empty($data['title'])) {
             $_SESSION['error'] = 'O nome do produto é obrigatório.';
-            redirect('/produtos/novo');
+            redirect($_ENV['APP_BASE'].'/produtos/novo');
             return;
         }
 
@@ -53,7 +53,7 @@ class ProductController
             $_SESSION['error'] = 'Erro ao cadastrar o produto.';
         }
 
-        redirect('/produtos');
+        redirect($_ENV['APP_BASE'].'/produtos');
     }
 
     public function edit(int $id): void
@@ -65,7 +65,7 @@ class ProductController
 
         if (!$item) {
             $_SESSION['error'] = 'Produto não encontrado.';
-            redirect('/produtos');
+            redirect($_ENV['APP_BASE'].'/produtos');
             return;
         }
 
@@ -94,7 +94,7 @@ class ProductController
             ? 'Produto atualizado com sucesso!'
             : 'Erro ao atualizar produto.';
 
-        redirect('/produtos');
+        redirect($_ENV['APP_BASE'].'/produtos');
     }
 
     public function delete(int $id): void
@@ -105,7 +105,7 @@ class ProductController
         $product->delete($id);
 
         $_SESSION['success'] = 'Produto removido com sucesso!';
-        redirect('/produtos');
+        redirect($_ENV['APP_BASE'].'/produtos');
     }
 
     public function reactivate(int $id): void
@@ -116,6 +116,6 @@ class ProductController
         $product->reactivate($id);
 
         $_SESSION['success'] = 'Produto reativado com sucesso!';
-        redirect('/produtos');
+        redirect($_ENV['APP_BASE'].'/produtos');
     }
 }

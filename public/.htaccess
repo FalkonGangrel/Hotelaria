@@ -44,7 +44,7 @@ RewriteEngine On
 
 # Define a base da reescrita. No caso de localhost, geralmente é a raiz do domínio.
 # Se sua aplicação estiver em um subdiretório (e.g., localhost/meu_projeto), ajuste para /meu_projeto/
-RewriteBase /
+RewriteBase /prj_01/public/
 
 # Redireciona requisições para o seu index.php na pasta public.
 # Essa é a regra que garante que todas as URLs da sua aplicação sejam processadas

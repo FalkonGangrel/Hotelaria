@@ -4,10 +4,10 @@ ob_start();
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2><?= $title ?></h2>
-    <a href="/produtos" class="btn btn-secondary">Voltar</a>
+    <a href="<?=$_ENV['APP_BASE']?>/produtos" class="btn btn-secondary">Voltar</a>
 </div>
 
-<form method="post" action="<?= isset($product) ? '/produtos/atualizar/' . $product['id'] : '/produtos/salvar' ?>">
+<form method="post" action="<?= isset($product) ? $_ENV['APP_BASE'].'/produtos/atualizar/' . $product['id'] : $_ENV['APP_BASE'].'/produtos/salvar' ?>">
     <div class="mb-3">
         <label class="form-label">SKU</label>
         <input type="text" name="sku" class="form-control" value="<?= htmlspecialchars($product['sku'] ?? '') ?>">

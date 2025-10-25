@@ -12,7 +12,7 @@
         <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="/login/autenticar">
+    <form method="POST" action="<?=$_ENV['APP_BASE']?>/login/autenticar">
         <div class="mb-3">
             <label for="email" class="form-label">E-mail</label>
             <input type="email" name="email" id="email" class="form-control" required>
