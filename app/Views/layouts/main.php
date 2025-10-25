@@ -1,4 +1,10 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
+<?php
+    if(isset['user']){
+        include __DIR__ . '/../layouts/header.php';
+    } else {
+        include __DIR__ . '/../layouts/header2.php';
+    }
+?>
 
 <main class="container container-main">
     <?= $content ?? '' ?>
