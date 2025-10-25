@@ -1,5 +1,9 @@
+# Ignorar todos os arquivos .htaccess
+**/.htaccess
+# Ignorar diretórios comuns de dependências e configurações
 /vendor/
 /storage
 /.vscode
+# Ignorar arquivos de ambiente
 .env
 .envh
