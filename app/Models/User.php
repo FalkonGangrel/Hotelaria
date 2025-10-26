@@ -8,8 +8,19 @@ class User extends BaseModel
     {
         $sql = "SELECT * FROM users WHERE login = :email LIMIT 1";
         $db = static::db();
-        $db->query($sql, [':email' => $email]);
+        $params = [
+            ':email' => $email
+        ];
+        $db->query($sql, $params);
         $row = $db->fetchArray();
         return $row ?: null;
+    }
+
+    public function all()
+    {
+        $sql = "SELECT * FROM users ORDER BY nome ASC";
+        $db = static::db();
+        $db->query($sql);
+        return $db->fetchAll();
     }
 }
