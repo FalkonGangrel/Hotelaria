@@ -1,7 +1,8 @@
 <?php
 use App\Controllers\LoginController;
-use App\Controllers\ProductController;
 use App\Controllers\DashboardController;
+use App\Controllers\ProductController;
+use App\Controllers\SupplierController;
 
 /**
  * Sistema simples de rotas com suporte a múltiplas rotas e métodos HTTP.
@@ -99,6 +100,15 @@ route('GET', $_ENV['APP_BASE'].'/produtos/editar/:id', [ProductController::class
 route('POST', $_ENV['APP_BASE'].'/produtos/atualizar/:id', [ProductController::class, 'update']);
 route('GET', $_ENV['APP_BASE'].'/produtos/excluir/:id', [ProductController::class, 'delete']);
 route('GET', $_ENV['APP_BASE'].'/produtos/reativar/:id', [ProductController::class, 'reactivate']);
+
+// Fornecedores
+route('GET', $_ENV['APP_BASE'].'/fornecedores', [SupplierController::class, 'index']);
+route('GET', $_ENV['APP_BASE'].'/fornecedores/novo', [SupplierController::class, 'create']);
+route('POST', $_ENV['APP_BASE'].'/fornecedores/salvar', [SupplierController::class, 'store']);
+route('GET', $_ENV['APP_BASE'].'/fornecedores/editar/:id', [SupplierController::class, 'edit']);
+route('POST', $_ENV['APP_BASE'].'/fornecedores/atualizar/:id', [SupplierController::class, 'update']);
+route('GET', $_ENV['APP_BASE'].'/fornecedores/excluir/:id', [SupplierController::class, 'delete']);
+route('GET', $_ENV['APP_BASE'].'/fornecedores/reativar/:id', [SupplierController::class, 'reactivate']);
 
 /**
  * Dispara o roteamento

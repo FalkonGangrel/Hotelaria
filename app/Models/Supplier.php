@@ -2,47 +2,76 @@
 
 namespace App\Models;
 
-use App\Core\clDB;
-
-class Supplier
+class Supplier extends BaseModel
 {
-    private clDB $db;
+    protected $table = 'suppliers';
 
-    public function __construct()
+    public function all()
     {
-        $this->db = db();
+        $sql = "SELECT s.*, u.name AS user_name
+                FROM {$this->table} s
+                LEFT JOIN users u ON s.user_id = u.id
+                ORDER BY s.company_name ASC";
+        $db = static::db();
+        $db->query($sql);
+        return $db->fetchAll();
     }
 
-    public function all(): array
+    public function find($id)
     {
-        $sql = "SELECT * FROM suppliers ORDER BY id DESC";
-        $this->db->query($sql);
-        return $this->db->fetchAll();
-    }
-
-    public function find(int $id): ?array
-    {
-        $sql = "SELECT * FROM suppliers WHERE id = ?";
-        $this->db->query($sql, $id);
-        $row = $this->db->fetchArray();
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id LIMIT 1";
+        $db = static::db();
+        $params = [
+            ':id' => $id
+        ];
+        $db->query($sql, $params);
+        $row = $db->fetchArray();
         return $row ?: null;
     }
 
-    public function create(array $data): bool
+    public function create(array $data): int|false
     {
-        $sql = "INSERT INTO suppliers (name, email, phone) VALUES (?, ?, ?)";
-        return $this->db->query($sql, $data['name'], $data['email'], $data['phone']);
+        $sql = "INSERT INTO {$this->table} (user_id, company_name)
+                VALUES (:user_id, :company_name) RETURNING id";
+        $db = static::db();
+        $params = [
+            ':company_name' => $data['company_name'],
+            ':user_id' => $_SESSION['user']['id']
+        ];
+        $db->query($sql, $params);
+        $row = $db->fetchArray();
+        return $row['id'] ?? false;
     }
 
     public function update(int $id, array $data): bool
     {
-        $sql = "UPDATE suppliers SET name = ?, email = ?, phone = ? WHERE id = ?";
-        return $this->db->query($sql, $data['name'], $data['email'], $data['phone'], $id);
+        $sql = "UPDATE {$this->table}
+                SET company_name = :company_name WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':company_name' => $data['company_name'],
+            ':id' => $id
+        ];
+        return $db->query($sql, $params);
     }
 
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM suppliers WHERE id = ?";
-        return $this->db->query($sql, $id);
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':id' => $id
+        ];
+        return $db->query($sql, $params);
+    }
+
+    public function reactivate(int $id): bool
+    {
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':id' => $id
+        ];
+        return $db->query($sql, $params);
     }
 }
