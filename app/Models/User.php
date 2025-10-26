@@ -18,7 +18,7 @@ class User extends BaseModel
 
     public function all()
     {
-        $sql = "SELECT * FROM users ORDER BY nome ASC";
+        $sql = "SELECT * FROM users ORDER BY name ASC";
         $db = static::db();
         $db->query($sql);
         return $db->fetchAll();
