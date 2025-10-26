@@ -2,60 +2,83 @@
 
 namespace App\Models;
 
-use App\Core\clDB;
-
-class Product
+class Product extends BaseModel
 {
-    private clDB $db;
-
-    public function __construct()
-    {
-        $this->db = db();
-    }
+    protected $table = 'products';
 
     public function all(): array
     {
-        $sql = "SELECT * FROM products ORDER BY id DESC";
-        $this->db->query($sql);
-        return $this->db->fetchAll();
+        $sql = "SELECT * FROM {$this->table} ORDER BY id DESC";
+        $db = static::db();
+        $db->query($sql);
+        return $db->fetchAll();
     }
 
     public function find(int $id): ?array
     {
-        $sql = "SELECT * FROM products WHERE id = ?";
-        $this->db->query($sql, [$id]);
-        $row = $this->db->fetchArray();
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':id' => $id
+        ];
+        $db->query($sql, $params);
+        $row = $db->fetchArray();
         return $row ?: null;
     }
 
     public function create(array $data): int|false
     {
-        $sql = "INSERT INTO products (sku, title, description, price, active) 
-                VALUES (?, ?, ?, ?, ?) RETURNING id";
-        $this->db->query($sql, [$data['sku'], $data['title'], $data['description'], $data['price'], $data['active']]);
-        $row = $this->db->fetchArray();
+        $sql = "INSERT INTO {$this->table} (sku, title, description, price, active)
+                VALUES (:sku, :title, :description, :price, :active) RETURNING id";
+        $db = static::db();
+        $params = [
+            ':sku' => $data['sku'],
+            ':title' => $data['title'],
+            ':description' => $data['description'],
+            ':price' => $data['price'],
+            ':active' => $data['active']
+        ];
+        $db->query($sql, $params);
+        $row = $db->fetchArray();
         return $row['id'] ?? false;
     }
 
     public function update(int $id, array $data): bool
     {
-        $sql = "UPDATE products 
-                SET sku = ?, title = ?, description = ?, price = ?, active = ?, updated_at = now()
-                WHERE id = ?";
-        return $this->db->query($sql, [$data['sku'], $data['title'], $data['description'], $data['price'], $data['active'], $id]);
+        $sql = "UPDATE {$this->table}
+                SET sku = :sku, title = :title, description = :description, price = :price, active = :active, updated_at = now()
+                WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':sku' => $data['sku'],
+            ':title' => $data['title'],
+            ':description' => $data['description'],
+            ':price' => $data['price'],
+            ':active' => $data['active'],
+            ':id' => $id
+        ];
+        return $db->query($sql, $params);
     }
 
     public function delete(int $id): bool
     {
         // Soft delete (marca como inativo)
-        $sql = "UPDATE products SET active = false, updated_at = now() WHERE id = ?";
-        return $this->db->query($sql, [$id]);
+        $sql = "UPDATE {$this->table} SET active = false, updated_at = now() WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':id' => $id
+        ];
+        return $db->query($sql, $params);
     }
 
     public function reactivate(int $id): bool
     {
         // Soft delete (marca como inativo)
-        $sql = "UPDATE products SET active = true, updated_at = now() WHERE id = ?";
-        return $this->db->query($sql, [$id]);
+        $sql = "UPDATE {$this->table} SET active = true, updated_at = now() WHERE id = :id";
+        $db = static::db();
+        $params = [
+            ':id' => $id
+        ];
+        return $db->query($sql, $params);
     }
 }
