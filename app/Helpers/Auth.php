@@ -6,8 +6,9 @@ class Auth
 {
     /**
      * Verifica se o usuário está logado e tem permissão.
-     * 
+     *
      * @param array $roles Perfis permitidos (ex: ['master', 'admin'])
+     * @return bool
      */
     public static function authorize(array $roles = []): bool
     {
@@ -15,10 +16,10 @@ class Auth
             session_start();
         }
 
-        if (!isset($_SESSION['user'])) {
-            $url = $_ENV['APP_BASE'].'/login';
+        // Se não estiver logado
+        if (!isset($_SESSION['user']) || empty($_SESSION['user'])) {
             $_SESSION['error'] = 'Você precisa estar logado para acessar esta página.';
-            header('Location: ' . $url);
+            header('Location: ' . ($_ENV['APP_BASE'] ?? '') . '/login');
             exit;
         }
 
@@ -29,11 +30,16 @@ class Auth
             return true;
         }
 
-        // Verifica se o papel do usuário está na lista permitida
-        if (!in_array($user['role'], $roles)) {
-            $url = $_ENV['APP_BASE'].'/dashboard';
+        /**
+         * 🔎 Compatibilidade:
+         * - $user['role_name'] → nome vindo do JOIN com tabela roles
+         * - $user['role'] → usado apenas por compatibilidade retroativa
+         */
+        $roleName = $user['role_name'] ?? $user['role'] ?? null;
+
+        if (!$roleName || !in_array($roleName, $roles)) {
             $_SESSION['error'] = 'Você não tem permissão para acessar esta área.';
-            header('Location: ' . $url);
+            header('Location: ' . ($_ENV['APP_BASE'] ?? '') . '/dashboard');
             exit;
         }
 
@@ -45,6 +51,10 @@ class Auth
      */
     public static function user(): ?array
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         return $_SESSION['user'] ?? null;
     }
 
@@ -57,10 +67,10 @@ class Auth
             session_start();
         }
 
-        unset($_SESSION['user']);
+        $_SESSION = [];
         session_destroy();
-        $url = $_ENV['APP_BASE'].'/dashboard';
-        header('Location: '. $url);
+
+        header('Location: ' . ($_ENV['APP_BASE'] ?? '') . '/login');
         exit;
     }
 }

@@ -6,7 +6,12 @@ class User extends BaseModel
 {
     public static function findByEmail($email)
     {
-        $sql = "SELECT * FROM users WHERE login = :email LIMIT 1";
+        $sql = "SELECT
+                    u.*, r.name AS role
+                FROM users u
+                JOIN roles r ON u.role_id = r.id
+                WHERE u.login = :email
+                LIMIT 1";
         $db = static::db();
         $params = [
             ':email' => $email

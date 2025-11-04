@@ -40,9 +40,10 @@ class LoginController
         // Armazena dados mínimos na sessão
         $_SESSION['user'] = [
             'id' => $user['id'],
-            'nome' => $user['nome'],
+            'nome' => $user['name'],
             'email' => $user['email'],
-            'role' => $user['role']
+            'role_name' => $user['role'],
+            'role_id' => $user['role_id']
         ];
 
         $_SESSION['success'] = 'Bem-vindo, ' . $user['name'] . '!';
